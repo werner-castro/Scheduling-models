@@ -102,7 +102,6 @@ if termination_status(sfs) == MOI.OPTIMAL
     s = sequence(value.(z))
 
     # gerando o relatório de saída
-    clearconsole()
     println(" ")
     println("Modelo de programação: [flow shop]")
     println(" ")
