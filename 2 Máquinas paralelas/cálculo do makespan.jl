@@ -5,7 +5,7 @@
 # n = número de tarefas
 
 # p = 1:n, tempo de processamento das n tarefas
-# s = 1:n, vetor de tarefas
+# s = 1:n, vetor de tarefas / sequência de processamento
 
 using Random, Plots
 
