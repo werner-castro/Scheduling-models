@@ -30,16 +30,16 @@ function parallel_mp(s::AbstractArray, p::Array{Int64}, m::Int64)
     return gantt(matriz_tempos, obj, obj, "n")
 end
 
-# número de maquinas
-m = 3
+# # número de maquinas
+# m = 3
 
-# número de tarefas
-n = 20
+# # número de tarefas
+# n = 20
 
-# sequência das tarefas (gerando de forma aleatória)
-seq = shuffle([1:n...])
+# # sequência das tarefas (gerando de forma aleatória)
+# seq = shuffle([1:n...])
 
-# tempos de processamento das tarefas
-p = rand(3:15,n,1)
+# # tempos de processamento das tarefas
+# p = rand(3:15,n,1)
 
-parallel_mp(seq,p,m)
+# parallel_mp(seq,p,m)
