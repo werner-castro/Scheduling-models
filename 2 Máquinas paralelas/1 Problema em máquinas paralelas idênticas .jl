@@ -42,75 +42,6 @@ using JuMP, Cbc
 
 include("graph.jl")
 
-function MP(p::Vector{Int64}, J::Int64, T::Int64)
-
-    smpi = Model(optimizer_with_attributes(Cbc.Optimizer, "threads" => 5, "seconds" => 300))
-
-    # Indices:
-    I = length(p)       # número de tarefas
-
-    # Variáveis:
-    @variable(smpi, x[i in 1:I, j in 1:J], Bin)
-    @variable(smpi, Cmax >= 0)
-
-    # Função objetivo:
-    @objective(smpi, Min, Cmax)
-
-    # Restrições:
-    @constraint(smpi, [i in 1:I], sum(x[i,j] for j = 1:J) == 1)
-    @constraint(smpi, [j in 1:J], Cmax >= sum(p[i] * x[i,j] for i = 1:I))
-    @constraint(smpi, Cmax <= T)
-
-    # Otimizando o problema
-    optimize!(smpi)
-
-    # clearconsole()
-
-    # Validando o status da solução e gerando o relatório de saída
-    if termination_status(smpi) == MOI.OPTIMAL
-        clearconsole()
-        s = value.(x) .* p
-        sol = (round.(Int, objective_value(smpi)))
-        print("=========== relatório de alocação =========== \n")
-        println(" ")
-        print("Máquinas não acionadas: ")
-        for j = 1:J
-            if sum(value.(x[1:end,j])) == 0
-                print("$([j])")
-            end
-        end
-        println(" ")
-        println(" ")
-        for j = 1:J
-            if ((sum(value.(x[1:end,j]) .* p[1:end])) / T) >= 0.85
-                print("Máquina $([j]) com [",round.(Int,((sum(value.(x[1:end,j]) .* p[1:end])) / T) * 100),"]% da capacidade utilizada")
-            end
-            if sum(value.(x[1:end,j])) > 0
-                print("A máquina $([j]) recebeu as tarefas: ")
-                for i = 1:I
-                    if value.(x[i,j]) > 0
-                        print("$([i])")
-                    end
-                end
-            else
-                continue
-            end
-            println(" ")
-        end
-        println(" ")
-        println("===== relatório de capacidade utilizada =====")
-        println(" ")
-        for j = 1:J
-            println("Máquina $([j]) com [",round.(Int,((sum(value.(x[1:end,j]) .* p[1:end])) / T) * 100),"]% da capacidade utilizada")
-        end
-        # gráfico de gantt
-        gantt(s,T,smpi,"n")
-    else
-        println("Solução não encontrada !")
-    end
-end
-
-
 # Parâmetros:
 n = 50 # número de jobs
 
@@ -119,5 +50,67 @@ p = rand(1:10,n)      # tempos de processamento entre 1 e 10
 J = 6                 # número de máquinas
 T = 60                # capacidade das máquinas em minutos
 
-# rodando o modelo
-MP(p,J,T)
+smpi = Model(optimizer_with_attributes(Cbc.Optimizer, "threads" => 5, "seconds" => 300))
+
+# Indices:
+I = length(p)       # número de tarefas
+
+# Variáveis:
+@variable(smpi, x[i in 1:I, j in 1:J], Bin)
+@variable(smpi, Cmax >= 0)
+
+# Função objetivo:
+@objective(smpi, Min, Cmax)
+
+# Restrições:
+@constraint(smpi, [i in 1:I], sum(x[i,j] for j = 1:J) == 1)
+@constraint(smpi, [j in 1:J], Cmax >= sum(p[i] * x[i,j] for i = 1:I))
+@constraint(smpi, Cmax <= T)
+
+# Otimizando o problema
+optimize!(smpi)
+
+# clearconsole()
+
+# Validando o status da solução e gerando o relatório de saída
+if termination_status(smpi) == MOI.OPTIMAL
+    clearconsole()
+    s = value.(x) .* p
+    sol = (round.(Int, objective_value(smpi)))
+    print("=========== relatório de alocação =========== \n")
+    println(" ")
+    print("Máquinas não acionadas: ")
+    for j = 1:J
+        if sum(value.(x[1:end,j])) == 0
+            print("$([j])")
+        end
+    end
+    println(" ")
+    println(" ")
+    for j = 1:J
+        if ((sum(value.(x[1:end,j]) .* p[1:end])) / T) >= 0.85
+            print("Máquina $([j]) com [",round.(Int,((sum(value.(x[1:end,j]) .* p[1:end])) / T) * 100),"]% da capacidade utilizada")
+        end
+        if sum(value.(x[1:end,j])) > 0
+            print("A máquina $([j]) recebeu as tarefas: ")
+            for i = 1:I
+                if value.(x[i,j]) > 0
+                    print("$([i])")
+                end
+            end
+        else
+            continue
+        end
+        println(" ")
+    end
+    println(" ")
+    println("===== relatório de capacidade utilizada =====")
+    println(" ")
+    for j = 1:J
+        println("Máquina $([j]) com [",round.(Int,((sum(value.(x[1:end,j]) .* p[1:end])) / T) * 100),"]% da capacidade utilizada")
+    end
+    # gráfico de gantt
+    gantt(s,T,smpi,"n")
+else
+    println("Solução não encontrada !")
+end
