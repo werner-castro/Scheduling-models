@@ -70,11 +70,8 @@ I = length(p)       # número de tarefas
 # Otimizando o problema
 optimize!(smpi)
 
-# clearconsole()
-
 # Validando o status da solução e gerando o relatório de saída
 if termination_status(smpi) == MOI.OPTIMAL
-    clearconsole()
     s = value.(x) .* p
     sol = (round.(Int, objective_value(smpi)))
     print("=========== relatório de alocação =========== \n")
@@ -95,7 +92,7 @@ if termination_status(smpi) == MOI.OPTIMAL
             print("A máquina $([j]) recebeu as tarefas: ")
             for i = 1:I
                 if value.(x[i,j]) > 0
-                    print("$([i])")
+                    print("$([i]) ")
                 end
             end
         else
