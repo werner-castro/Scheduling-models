@@ -3,7 +3,7 @@ Modelos matemáticos  para problemas de sequenciamento de tarefas / programaçã
 
 ## Modelos
 
-- Máquina única      / single machine
-- Máquinas paralelas / parallel machines
-- Job shop
-- Flow shop
+- Máquina única      / single machine e variações
+- Máquinas paralelas / parallel machines e variações
+- Job shop e variações
+- Flow shop e variações
